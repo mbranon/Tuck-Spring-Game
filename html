@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Spring Choice Game</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #0b0f0d;
+      color: #e8f5ee;
+    }
+    .card{
+      width: min(820px, 92vw);
+      background: rgba(22, 34, 28, 0.85);
+      border: 1px solid rgba(232,245,238,0.15);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      overflow: hidden;
+    }
+    header{
+      padding: 18px 20px;
+      background: rgba(0,0,0,0.22);
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(232,245,238,0.12);
+    }
+    header h1{
+      font-size: 18px;
+      margin: 0;
+      letter-spacing: 0.4px;
+      font-weight: 650;
+    }
+    .tag{
+      font-size: 12px;
+      opacity: 0.9;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(232,245,238,0.18);
+      background: rgba(232,245,238,0.06);
+      user-select: none;
+      white-space: nowrap;
+    }
+    main{ padding: 20px; }
+    .scene-title{
+      font-size: 20px;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+    .text{
+      line-height: 1.55;
+      font-size: 16px;
+      margin: 0 0 16px 0;
+      opacity: 0.98;
+      white-space: pre-line;
+    }
+    .choices{
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    button.choice{
+      text-align: left;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(232,245,238,0.18);
+      background: rgba(232,245,238,0.06);
+      color: #e8f5ee;
+      cursor: pointer;
+      transition: transform 0.05s ease, background 0.2s ease, border 0.2s ease;
+      font-size: 15px;
+    }
+    button.choice:hover{
+      background: rgba(232,245,238,0.10);
+      border-color: rgba(232,245,238,0.28);
+    }
+    button.choice:active{ transform: translateY(1px); }
+    .footer{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      opacity: 0.95;
+      align-items:center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(232,245,238,0.12);
+      padding-top: 16px;
+    }
+    .stats{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .pill{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(232,245,238,0.18);
+      background: rgba(232,245,238,0.06);
+      user-select:none;
+    }
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .small-btn{
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(232,245,238,0.18);
+      background: rgba(232,245,238,0.06);
+      color: #e8f5ee;
+      cursor:pointer;
+    }
+    .small-btn:hover{ background: rgba(232,245,238,0.10); }
+    .note{
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+    .fade{
+      animation: fadeIn 220ms ease;
+    }
+    @keyframes fadeIn{
+      from{ opacity: 0; transform: translateY(4px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(232,245,238,0.20);
+      background: rgba(232,245,238,0.08);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="application" aria-label="The Spring Choice Game">
+    <header>
+      <h1>The Spring Choice Game</h1>
+      <div class="tag" id="moodTag">Mood: Quiet & Mysterious</div>
+    </header>
+
+    <main>
+      <h2 class="scene-title" id="sceneTitle"></h2>
+      <p class="text fade" id="sceneText"></p>
+
+      <div class="choices" id="choices"></div>
+
+      <div class="footer">
+        <div class="stats">
+          <span class="pill" id="pathPill">Path: —</span>
+          <span class="pill" id="stepsPill">Steps: 0</span>
+          <span class="pill" id="endingPill">Ending: —</span>
+        </div>
+        <div class="actions">
+          <button class="small-btn" id="backBtn" title="Go back one choice (B)">← Back</button>
+          <button class="small-btn" id="restartBtn" title="Restart (R)">↻ Restart</button>
+        </div>
+      </div>
+
+      <div class="note">
+        Teacher tip: Students can edit the story text inside the <span class="kbd">scenes</span> object in the code below.
+        They can also add new scenes by creating a new key and linking choices to it.
+        Keyboard: <span class="kbd">B</span> Back, <span class="kbd">R</span> Restart, <span class="kbd">1–4</span> choose.
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // --- STORY DATA (edit this part with students!) ---
+    // Each scene has:
+    // title: heading
+    // text: paragraph text (use \n for new lines)
+    // mood: small label at top
+    // choices: array of { label, to, effect }
+    // effect is optional: { courage:+1, secrecy:+1, etc. } just for fun tracking
+    const scenes = {
+      start: {
+        title: "The Woods at the Edge of Town",
+        mood: "Quiet & Mysterious",
+        text:
+          "The trees are close together here, like they’re whispering.\n" +
+          "You step off the path and follow a sound—drip… drip… drip.\n\n" +
+          "Then you see it: a small spring bubbling up from the ground.\n" +
+          "The water looks ordinary… but it doesn’t feel ordinary.\n\n" +
+          "What do you do?",
+        choices: [
+          { label: "Kneel down and take one careful sip.", to: "sip", effect: { courage: 1 } },
+          { label: "Fill a small bottle to bring home.", to: "bottle", effect: { secrecy: 1 } },
+          { label: "Mark the location and leave quickly.", to: "leave", effect: { wisdom: 1 } },
+          { label: "Call someone over to show them.", to: "tell", effect: { trust: 1 } }
+        ]
+      },
+
+      sip: {
+        title: "One Sip",
+        mood: "Unnervingly Calm",
+        text:
+          "The water is cold and clean.\n" +
+          "For a moment, everything is too sharp: the leaves, the air, even your heartbeat.\n\n" +
+          "You feel… normal. And also not.\n" +
+          "A thought hits you: If this spring is what people say it is, your choice can’t be undone.\n\n" +
+          "What now?",
+        choices: [
+          { label: "Tell no one. Walk away and keep living your life.", to: "ending_walkaway", effect: { secrecy: 2 } },
+          { label: "Go find answers—quietly.", to: "investigate", effect: { wisdom: 1 } },
+          { label: "Take another sip… just to be sure.", to: "second_sip", effect: { temptation: 1 } }
+        ]
+      },
+
+      second_sip: {
+        title: "The Second Sip",
+        mood: "Tense & Tempting",
+        text:
+          "You drink again.\n\n" +
+          "It isn’t dramatic. No lightning. No magic glow.\n" +
+          "But something in you settles, like a door clicking shut.\n\n" +
+          "You look at the woods and wonder: how many people have stood here and made a choice they couldn’t take back?",
+        choices: [
+          { label: "Hide the spring by covering the path with branches.", to: "ending_guardian", effect: { courage: 1, secrecy: 2 } },
+          { label: "Tell one trusted person—you can’t carry this alone.", to: "tell_one", effect: { trust: 1 } }
+        ]
+      },
+
+      bottle: {
+        title: "A Bottle of Forever?",
+        mood: "Suspicious & Heavy",
+        text:
+          "You fill a bottle. It feels heavier than it should.\n\n" +
+          "On the way home, you keep checking your pocket like it might burn through.\n" +
+          "If the water can change life… it can change life for everyone.\n\n" +
+          "What do you do with it?",
+        choices: [
+          { label: "Hide it somewhere safe and secret.", to: "ending_secret", effect: { secrecy: 2 } },
+          { label: "Pour it out. Some things shouldn’t be owned.", to: "ending_pour", effect: { wisdom: 2 } },
+          { label: "Show it to an adult you trust.", to: "tell", effect: { trust: 1 } }
+        ]
+      },
+
+      leave: {
+        title: "Walking Away",
+        mood: "Peaceful & Uneasy",
+        text:
+          "You back away slowly, like the spring might notice you.\n\n" +
+          "On the path home, you feel the world moving forward the way it always has.\n" +
+          "People grow up. People grow old.\n" +
+          "Seasons change.\n\n" +
+          "And you wonder: Is walking away brave… or is it fear?",
+        choices: [
+          { label: "Decide you’re done. Never return.", to: "ending_walkaway", effect: { wisdom: 1 } },
+          { label: "Promise yourself you’ll come back with a plan.", to: "investigate", effect: { wisdom: 1 } }
+        ]
+      },
+
+      tell: {
+        title: "You Tell Someone",
+        mood: "Fast & Dangerous",
+        text:
+          "Words spill out quickly: the woods, the spring, the feeling that it matters.\n\n" +
+          "The person’s face changes as you talk.\n" +
+          "Curiosity turns into something sharper.\n\n" +
+          "Soon, the question isn’t just what the spring is…\n" +
+          "It’s who else might hear about it.",
+        choices: [
+          { label: "Try to take it back—say you were imagining things.", to: "ending_spread", effect: { fear: 1 } },
+          { label: "Ask them to help you protect the spring instead.", to: "protect_team", effect: { trust: 1, courage: 1 } }
+        ]
+      },
+
+      tell_one: {
+        title: "Just One Person",
+        mood: "Careful & Honest",
+        text:
+          "You choose one person you truly trust.\n\n" +
+          "They listen—really listen.\n" +
+          "And instead of asking what they can gain, they ask what you’re afraid of.\n\n" +
+          "You realize this might not be a problem you solve alone.",
+        choices: [
+          { label: "Make a pact: protect the spring and keep it secret.", to: "ending_pact", effect: { trust: 2, secrecy: 1 } },
+          { label: "Make a pact: find someone wise to guide you.", to: "investigate", effect: { wisdom: 1, trust: 1 } }
+        ]
+      },
+
+      investigate: {
+        title: "Looking for Answers",
+        mood: "Curious & Cautious",
+        text:
+          "You search for stories, rumors, and anyone who might know more.\n\n" +
+          "The more you learn, the more complicated it becomes:\n" +
+          "Living forever sounds like a gift… until you imagine the cost.\n\n" +
+          "You come back to the woods with one clear thought:\n" +
+          "Choices matter most when you can’t undo them.",
+        choices: [
+          { label: "Decide to protect the spring from everyone.", to: "ending_guardian", effect: { courage: 1, secrecy: 1 } },
+          { label: "Decide the spring should be destroyed or hidden forever.", to: "ending_hide", effect: { wisdom: 2 } }
+        ]
+      },
+
+      protect_team: {
+        title: "A Team to Protect It",
+        mood: "Hopeful & Risky",
+        text:
+          "Together, you return to the spring.\n\n" +
+          "You plan: cover tracks, erase signs, keep watch.\n" +
+          "It feels brave.\n\n" +
+          "But teams are made of humans.\n" +
+          "Humans talk.\n\n" +
+          "And secrets have a way of becoming stories.",
+        choices: [
+          { label: "Keep the team small and commit to silence.", to: "ending_pact", effect: { trust: 1, secrecy: 1 } },
+          { label: "Worry it’s too risky—try to end the secret now.", to: "ending_spread", effect: { fear: 1 } }
+        ]
+      },
+
+      // --- ENDINGS ---
+      ending_walkaway: {
+        title: "Ending: The Ordinary Life",
+        mood: "Bittersweet",
+        text:
+          "You walk away.\n\n" +
+          "Days pass. Then months. Then years.\n" +
+          "Life keeps moving the way a river moves—forward.\n\n" +
+          "Sometimes you think about the spring.\n" +
+          "And sometimes, you’re relieved you never touched it again.\n\n" +
+          "THE END (for now).",
+        choices: [
+          { label: "Play again and choose differently.", to: "start" }
+        ],
+        ending: "Ordinary Life"
+      },
+
+      ending_secret: {
+        title: "Ending: Hidden in the Dark",
+        mood: "Heavy",
+        text:
+          "You hide the bottle.\n\n" +
+          "At first, it feels smart.\n" +
+          "But the secret doesn’t get lighter.\n" +
+          "It gets heavier, like it’s waiting.\n\n" +
+          "Some things aren’t dangerous because they’re loud.\n" +
+          "They’re dangerous because they can be used.\n\n" +
+          "THE END.",
+        choices: [
+          { label: "Restart and try another path.", to: "start" }
+        ],
+        ending: "Hidden Secret"
+      },
+
+      ending_pour: {
+        title: "Ending: Let It Go",
+        mood: "Relieved",
+        text:
+          "You uncork the bottle.\n\n" +
+          "The water pours out into the dirt.\n" +
+          "No fireworks. No thunder.\n\n" +
+          "But your chest feels easier.\n" +
+          "You can’t own forever.\n" +
+          "And maybe you shouldn’t.\n\n" +
+          "THE END.",
+        choices: [
+          { label: "Restart and make a new choice.", to: "start" }
+        ],
+        ending: "Let It Go"
+      },
+
+      ending_guardian: {
+        title: "Ending: Guardian of the Spring",
+        mood: "Resolute",
+        text:
+          "You choose to protect the spring.\n\n" +
+          "Not because it’s yours.\n" +
+          "Because it’s powerful.\n\n" +
+          "And you’ve learned something important:\n" +
+          "A choice isn’t just a moment.\n" +
+          "It’s a responsibility.\n\n" +
+          "THE END.",
+        choices: [
+          { label: "Play again.", to: "start" }
+        ],
+        ending: "Guardian"
+      },
+
+      ending_pact: {
+        title: "Ending: The Pact",
+        mood: "Hopeful",
+        text:
+          "You and your trusted person make a pact.\n\n" +
+          "No fame. No money. No attention.\n" +
+          "Just protection.\n\n" +
+          "You don’t know if it’s the perfect answer.\n" +
+          "But it’s an answer you can live with.\n\n" +
+          "THE END.",
+        choices: [
+          { label: "Restart.", to: "start" }
+        ],
+        ending: "The Pact"
+      },
+
+      ending_hide: {
+        title: "Ending: Buried Forever",
+        mood: "Quiet & Final",
+        text:
+          "You choose to hide the spring—really hide it.\n\n" +
+          "You cover the place. You erase the path. You leave no sign.\n" +
+          "The woods swallow your footprints like they were never there.\n\n" +
+          "Some secrets aren’t meant to be kept.\n" +
+          "They’re meant to be ended.\n\n" +
+          "THE END.",
+        choices: [
+          { label: "Play again.", to: "start" }
+        ],
+        ending: "Buried"
+      },
+
+      ending_spread: {
+        title: "Ending: The Story Escapes",
+        mood: "Chaotic",
+        text:
+          "The secret doesn’t stay secret.\n\n" +
+          "A whisper becomes a rumor.\n" +
+          "A rumor becomes a crowd.\n\n" +
+          "People don’t arrive with calm questions.\n" +
+          "They arrive with wants.\n\n" +
+          "You realize too late:\n" +
+          "Some things change the world just by being known.\n\n" +
+          "THE END.",
+        choices: [
+          { label: "Restart and try to protect the spring.", to: "start" }
+        ],
+        ending: "It Spreads"
+      }
+    };
+
+    // --- GAME ENGINE (no need to edit for simple classroom use) ---
+    const titleEl = document.getElementById("sceneTitle");
+    const textEl = document.getElementById("sceneText");
+    const choicesEl = document.getElementById("choices");
+    const moodTag = document.getElementById("moodTag");
+    const pathPill = document.getElementById("pathPill");
+    const stepsPill = document.getElementById("stepsPill");
+    const endingPill = document.getElementById("endingPill");
+    const backBtn = document.getElementById("backBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    let current = "start";
+    let history = [];      // stack of previous scenes
+    let path = [];         // scene ids visited
+    let stats = { courage: 0, secrecy: 0, wisdom: 0, trust: 0, fear: 0, temptation: 0 };
+
+    function render(sceneId, pushHistory = true) {
+      const scene = scenes[sceneId];
+      if (!scene) return;
+
+      if (pushHistory && sceneId !== current) {
+        history.push(current);
+      }
+      current = sceneId;
+      path.push(sceneId);
+
+      // Update UI
+      titleEl.textContent = scene.title || "";
+      moodTag.textContent = `Mood: ${scene.mood || "—"}`;
+
+      // fade re-trigger
+      textEl.classList.remove("fade");
+      void textEl.offsetWidth;
+      textEl.classList.add("fade");
+      textEl.textContent = scene.text || "";
+
+      // Choices
+      choicesEl.innerHTML = "";
+      (scene.choices || []).forEach((c, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.type = "button";
+        btn.innerHTML = `<strong>${idx + 1}.</strong> ${c.label}`;
+        btn.addEventListener("click", () => choose(c));
+        choicesEl.appendChild(btn);
+      });
+
+      // Pills
+      const shortPath = path.slice(-5).map(id => id.replace(/^ending_/, "end:")).join(" → ");
+      pathPill.textContent = `Path: ${shortPath || "—"}`;
+      stepsPill.textContent = `Steps: ${Math.max(0, path.length - 1)}`;
+      endingPill.textContent = `Ending: ${scene.ending || "—"}`;
+
+      // Buttons
+      backBtn.disabled = history.length === 0;
+      backBtn.style.opacity = backBtn.disabled ? 0.5 : 1;
+    }
+
+    function choose(choice) {
+      // apply optional effect
+      if (choice.effect) {
+        for (const [k, v] of Object.entries(choice.effect)) {
+          stats[k] = (stats[k] || 0) + v;
+        }
+      }
+      render(choice.to, true);
+    }
+
+    function goBack() {
+      if (history.length === 0) return;
+      const prev = history.pop();
+      // remove current from path
+      path.pop();
+      render(prev, false);
+    }
+
+    function restart() {
+      current = "start";
+      history = [];
+      path = [];
+      stats = { courage: 0, secrecy: 0, wisdom: 0, trust: 0, fear: 0, temptation: 0 };
+      render("start", false);
+    }
+
+    // Keyboard shortcuts: 1-4 to choose, B back, R restart
+    document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+      if (key === "b") goBack();
+      if (key === "r") restart();
+
+      const scene = scenes[current];
+      const num = parseInt(e.key, 10);
+      if (!Number.isNaN(num) && scene && scene.choices && scene.choices[num - 1]) {
+        choose(scene.choices[num - 1]);
+      }
+    });
+
+    backBtn.addEventListener("click", goBack);
+    restartBtn.addEventListener("click", restart);
+
+    // Start game
+    render("start", false);
+  </script>
+</body>
+</html>
