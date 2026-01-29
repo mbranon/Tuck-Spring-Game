@@ -1,0 +1,311 @@
+/* ==========================
+   TUCK EVERLASTING VIBE THEME
+   Drop-in replacement for your <style> block
+   Adds: animated fog, drifting fireflies, forest gradient,
+   “storybook” text styling, and a scene image header.
+   ========================== */
+
+/* Optional: add these to your HTML inside .card, above <main>:
+   <div class="scene-art" id="sceneArt"><div class="scene-art__veil"></div></div>
+   (Then in JS set: document.getElementById("sceneArt").style.backgroundImage = `url(${scene.image})`; )
+*/
+
+:root{
+  --bg0:#050705;
+  --bg1:#0b1510;
+  --card:#0f1e17;
+  --ink:#e9f6ef;
+  --muted: rgba(233,246,239,.78);
+  --line: rgba(233,246,239,.14);
+  --glow: rgba(148, 255, 208, .20);
+  --glow2: rgba(160, 210, 255, .16);
+  --accent: rgba(148,255,208,.9);
+  --accent2: rgba(160,210,255,.85);
+
+  /* “storybook” sizing */
+  --radius: 18px;
+  --radius2: 14px;
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+  --shadow2: 0 10px 34px rgba(0,0,0,.45);
+}
+
+/* Base */
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 25% 10%, rgba(148,255,208,.10), transparent 60%),
+    radial-gradient(900px 600px at 80% 20%, rgba(160,210,255,.10), transparent 65%),
+    radial-gradient(1100px 800px at 50% 110%, rgba(0,0,0,.65), transparent 60%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  display:grid;
+  place-items:center;
+  overflow-x:hidden;
+}
+
+/* Atmospheric layers (fog + vignette) */
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:-20%;
+  pointer-events:none;
+  z-index:0;
+}
+body::before{
+  background:
+    radial-gradient(500px 220px at 10% 20%, rgba(255,255,255,.05), transparent 70%),
+    radial-gradient(600px 260px at 70% 30%, rgba(255,255,255,.05), transparent 72%),
+    radial-gradient(520px 240px at 35% 70%, rgba(255,255,255,.04), transparent 70%),
+    radial-gradient(680px 260px at 85% 80%, rgba(255,255,255,.04), transparent 75%);
+  filter: blur(10px);
+  opacity:.75;
+  animation: fogDrift 18s ease-in-out infinite alternate;
+}
+body::after{
+  background: radial-gradient(closest-side at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%);
+  opacity:.9;
+}
+@keyframes fogDrift{
+  from{ transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  to{ transform: translate3d(2%, 1%, 0) scale(1.05); }
+}
+
+/* Fireflies overlay (use with: <div class="fireflies"></div> inside body) */
+.fireflies{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  opacity:.7;
+  background:
+    radial-gradient(2px 2px at 10% 30%, rgba(255,255,180,.9), transparent 60%),
+    radial-gradient(2px 2px at 20% 80%, rgba(180,255,220,.9), transparent 60%),
+    radial-gradient(2px 2px at 35% 60%, rgba(255,255,180,.85), transparent 60%),
+    radial-gradient(2px 2px at 60% 25%, rgba(180,255,220,.85), transparent 60%),
+    radial-gradient(2px 2px at 75% 75%, rgba(255,255,180,.85), transparent 60%),
+    radial-gradient(2px 2px at 88% 40%, rgba(180,255,220,.85), transparent 60%),
+    radial-gradient(2px 2px at 50% 90%, rgba(255,255,180,.8), transparent 60%);
+  filter: blur(.2px);
+  animation: fireflyTwinkle 5.5s ease-in-out infinite;
+}
+@keyframes fireflyTwinkle{
+  0%,100%{ opacity:.45; transform: translateY(0); }
+  50%{ opacity:.85; transform: translateY(-4px); }
+}
+
+/* Card */
+.card{
+  position:relative;
+  z-index:2;
+  width:min(900px, 94vw);
+  background:
+    radial-gradient(1200px 500px at 10% 0%, rgba(148,255,208,.08), transparent 55%),
+    radial-gradient(900px 420px at 80% 10%, rgba(160,210,255,.07), transparent 60%),
+    rgba(15, 30, 23, .86);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  backdrop-filter: blur(8px);
+}
+
+/* Optional scene image header */
+.scene-art{
+  height: 180px;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.75)),
+    radial-gradient(600px 200px at 30% 10%, rgba(148,255,208,.10), transparent 70%);
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--line);
+  position:relative;
+}
+.scene-art__veil{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(800px 250px at 10% 20%, rgba(255,255,255,.05), transparent 70%),
+    radial-gradient(800px 250px at 90% 40%, rgba(255,255,255,.04), transparent 72%),
+    linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.70));
+  animation: fogDrift 16s ease-in-out infinite alternate;
+}
+
+/* Header bar */
+header{
+  padding: 18px 22px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(0,0,0,.28);
+  border-bottom: 1px solid var(--line);
+}
+header h1{
+  margin:0;
+  font-size: 18px;
+  letter-spacing:.6px;
+  font-weight: 800;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  text-transform: uppercase;
+}
+.tag{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,255,208,.25);
+  background: linear-gradient(90deg, rgba(148,255,208,.10), rgba(160,210,255,.08));
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;
+}
+
+/* Main text area */
+main{ padding: 22px; }
+
+.scene-title{
+  margin: 4px 0 8px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-shadow: 0 6px 22px rgba(0,0,0,.35);
+  letter-spacing:.2px;
+}
+.text{
+  margin: 0 0 14px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--muted);
+  white-space: pre-line;
+  position:relative;
+}
+.text::first-letter{
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 900;
+  float:left;
+  margin: 6px 10px 0 0;
+  color: rgba(233,246,239,.92);
+  text-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 18px rgba(148,255,208,.15);
+}
+
+/* Choice buttons */
+.choices{
+  display:grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+button.choice{
+  text-align:left;
+  padding: 14px 14px;
+  border-radius: var(--radius2);
+  border: 1px solid rgba(233,246,239,.16);
+  background:
+    radial-gradient(900px 120px at 0% 0%, rgba(148,255,208,.12), transparent 55%),
+    rgba(233,246,239,.06);
+  color: var(--ink);
+  cursor:pointer;
+  font-size: 16px;
+  line-height: 1.35;
+  transition: transform .08s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease;
+  box-shadow: 0 10px 26px rgba(0,0,0,.22);
+  position:relative;
+  overflow:hidden;
+}
+button.choice strong{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+button.choice::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(300px 120px at 20% 0%, rgba(160,210,255,.20), transparent 55%);
+  opacity:0;
+  transition: opacity .25s ease;
+}
+button.choice:hover{
+  transform: translateY(-1px);
+  border-color: rgba(148,255,208,.30);
+  background:
+    radial-gradient(900px 140px at 20% 0%, rgba(148,255,208,.18), transparent 60%),
+    rgba(233,246,239,.08);
+  box-shadow: 0 14px 34px rgba(0,0,0,.28), 0 0 0 1px rgba(148,255,208,.10) inset;
+}
+button.choice:hover::after{ opacity:1; }
+button.choice:active{ transform: translateY(0px); }
+button.choice:focus-visible{
+  outline: 3px solid rgba(148,255,208,.25);
+  outline-offset: 3px;
+}
+
+/* Footer bar */
+.footer{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  align-items:center;
+  justify-content: space-between;
+}
+
+.stats{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.pill{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(233,246,239,.16);
+  background: rgba(233,246,239,.06);
+}
+
+.actions{ display:flex; gap:10px; flex-wrap:wrap; }
+.small-btn{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 12px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(233,246,239,.16);
+  background: rgba(233,246,239,.06);
+  color: var(--ink);
+  cursor:pointer;
+  transition: background .2s ease, transform .08s ease, border-color .2s ease;
+}
+.small-btn:hover{
+  background: rgba(233,246,239,.10);
+  border-color: rgba(160,210,255,.22);
+}
+.small-btn:active{ transform: translateY(1px); }
+.small-btn:disabled{ opacity:.55; cursor:not-allowed; }
+
+/* Notes */
+.note{
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(233,246,239,.70);
+}
+.kbd{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(233,246,239,.18);
+  background: rgba(233,246,239,.08);
+}
+
+/* Animations */
+.fade{ animation: fadeIn 240ms ease; }
+@keyframes fadeIn{
+  from{ opacity:0; transform: translateY(6px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+/* Mobile tweaks */
+@media (max-width: 520px){
+  .scene-title{ font-size: 22px; }
+  .text{ font-size: 16px; }
+  .scene-art{ height: 140px; }
+}
